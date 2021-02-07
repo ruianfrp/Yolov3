@@ -142,25 +142,25 @@ class YOLO(object):
             bottom = min(image.size[1], np.floor(bottom + 0.5).astype('int32'))
             right = min(image.size[0], np.floor(right + 0.5).astype('int32'))
             # print(top, left, bottom, right)
-            point_x = (right + left) / 2
-            point_y = (top + bottom) / 2
-            # 判断是否有人
-            if predicted_class == 'person':
-                result = mysql.seat_select(point_x, point_y, classroom_id)
-                if result.__len__() == 1:
-                    mysql.seat_update(result[0][0])
-                elif result.__len__() >= 2:
-                    distance = 0.00
-                    r_id = 0
-                    for r in result:
-                        pic_x = (r[3] + r[4]) / 2
-                        pic_y = (r[1] + r[2]) / 2
-                        aa = round(math.sqrt(math.pow((pic_x - point_x)) + math.pow((pic_y - point_y))), 2)
-                        if aa > distance:
-                            r_id = r[0]
-                            distance = aa
-                    if r_id != 0:
-                        mysql.seat_update(r_id)
+            # point_x = (right + left) / 2
+            # point_y = (top + bottom) / 2
+            # # 判断是否有人
+            # if predicted_class == 'person':
+            #     result = mysql.seat_select(point_x, point_y, classroom_id)
+            #     if result.__len__() == 1:
+            #         mysql.seat_update(result[0][0])
+            #     elif result.__len__() >= 2:
+            #         distance = 0.00
+            #         r_id = 0
+            #         for r in result:
+            #             pic_x = (r[3] + r[4]) / 2
+            #             pic_y = (r[1] + r[2]) / 2
+            #             aa = round(math.sqrt(math.pow((pic_x - point_x)) + math.pow((pic_y - point_y))), 2)
+            #             if aa > distance:
+            #                 r_id = r[0]
+            #                 distance = aa
+            #         if r_id != 0:
+            #             mysql.seat_update(r_id)
 
         # print('6' * 60)
 

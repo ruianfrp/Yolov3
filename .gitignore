@@ -4,4 +4,5 @@
 /VOCdevkit/VOC2007/ImageSets/Main/*
 /VOCdevkit/VOC2007/JPEGImages/*
 /logs/*
+/venv/*
 /isPointInRect.py
