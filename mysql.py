@@ -151,7 +151,7 @@ def classroom_update(seat_num, classroom_info, classroom_id):
 
 
 # 添加座位信息（批量）
-def seat_insert_many(classroomId, data):
+def seat_insert_many(classroom_id, data):
     result = None
     conn = pymysql.connect(host="localhost", user="root", password="123456", database="seat_recommend",
                            charset="utf8")
@@ -159,7 +159,7 @@ def seat_insert_many(classroomId, data):
     cursor = conn.cursor()
     sql = "delete from seat where fk_classroom_id=%s;"
     try:
-        cursor.execute(sql, classroomId)
+        cursor.execute(sql, classroom_id)
         conn.commit()
         sql = "INSERT INTO seat(fk_classroom_id, seat_real_x, seat_real_y, seat_pic_top, seat_pic_bottom, " \
               "seat_pic_left, seat_pic_right, seat_state, seat_place) VALUES (%s, %s, %s, 0, 0, 0, 0, %s, %s);"
@@ -342,7 +342,7 @@ def seat_max_select(classroom_id):
 
 
 # 特殊位置空余搜索（教室页面搜索）
-def classroom_special_select(seatPlace):
+def classroom_special_select(seat_place):
     result = None
     conn = pymysql.connect(host="localhost", user="root", password="123456", database="seat_recommend",
                            charset="utf8")
@@ -355,7 +355,7 @@ def classroom_special_select(seatPlace):
           "as place_free_seat, classroom_info from classroom as c;"
     try:
         # 执行SQL语句
-        cursor.execute(sql, seatPlace)
+        cursor.execute(sql, seat_place)
         # 获取多条查询数据
         result = cursor.fetchall()
         cursor.close()
@@ -437,7 +437,7 @@ def seat_select(x, y, classroom_id):
 
 
 # 教室信息查询
-def get_classInfo_by_id(classroomId):
+def get_class_info_by_id(classroom_id):
     result = None
     conn = pymysql.connect(host="localhost", user="root", password="123456", database="seat_recommend",
                            charset="utf8")
@@ -448,7 +448,7 @@ def get_classInfo_by_id(classroomId):
           "and seat_state=0) as free_seat_num,classroom_info FROM classroom as c where c.id=%s;"
     try:
         # 执行SQL语句
-        cursor.execute(sql, classroomId)
+        cursor.execute(sql, classroom_id)
         # 获取多条查询数据
         result = cursor.fetchone()
         cursor.close()
@@ -596,7 +596,7 @@ def appointment_automatic():
 
 
 # 获取当前预约的座位
-def currently_appointment(userNo):
+def currently_appointment(user_no):
     result = None
     conn = pymysql.connect(host="localhost", user="root", password="123456", database="seat_recommend", charset="utf8")
     cursor = conn.cursor()
@@ -604,7 +604,7 @@ def currently_appointment(userNo):
           "appointment as a left join seat as s on a.fk_seat_id=s.id left join classroom as c on " \
           "c.id=a.fk_classroom_id where a.fk_user_no=%s and (a.if_done=0 or a.if_done=1);"
     try:
-        cursor.execute(sql, userNo)
+        cursor.execute(sql, user_no)
         result = cursor.fetchall()
         if result.__len__() != 0:
             cursor.close()

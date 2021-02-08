@@ -1,5 +1,3 @@
-import os
-
 import keras
 from PIL import Image
 from flask import Flask, request, jsonify
@@ -13,7 +11,6 @@ import token_authorization
 import AesCipher
 import mysql
 import functools
-import time
 
 from yolo import YOLO
 
@@ -186,6 +183,7 @@ def delete_classroom():
         app.logger.info(error)
         return jsonify({"code": 403, "error": error})
 
+
 # 修改教室信息
 @app.route('/classroom_update', methods=['POST'])
 def update_classroom():
@@ -245,27 +243,27 @@ def seat_num_get():
         return jsonify({"code": 403, "error": "数据库操作异常！"})
     else:
         data = {}
-        seatNums = []
-        seatNum1 = {
+        seat_nums = []
+        seat_num1 = {
             'seatPlaceNo': 0,
             'seatPlace': '普通',
             'counts': result1[0]
         }
-        seatNums.append(seatNum1)
-        seatNum2 = {
+        seat_nums.append(seat_num1)
+        seat_num2 = {
             'seatPlaceNo': 1,
             'seatPlace': '靠窗',
             'counts': result2[0]
         }
-        seatNums.append(seatNum2)
-        seatNum3 = {
+        seat_nums.append(seat_num2)
+        seat_num3 = {
             'seatPlaceNo': 2,
             'seatPlace': '靠门',
             'counts': result3[0]
         }
-        seatNums.append(seatNum3)
+        seat_nums.append(seat_num3)
         data['allSeatNum'] = result4[0]
-        data['seatNums'] = seatNums
+        data['seatNums'] = seat_nums
         app.logger.info("座位位置及数量返回成功！")
         return jsonify({"code": 200, "data": data, "info": "座位位置及数量返回成功！"})
 
@@ -306,8 +304,8 @@ def get_real_seat_info():
 @app.route('/classroom_special', methods=['POST'])
 def get_special_classroom_info():
     if request.get_json().get('seatPlace') != 'null':
-        seatPlace = request.get_json().get('seatPlace')
-        result = mysql.classroom_special_select(seatPlace)
+        seat_place = request.get_json().get('seatPlace')
+        result = mysql.classroom_special_select(seat_place)
         if result is None:
             app.logger.error("数据库操作异常！")
             return jsonify({"code": 403, "error": "数据库操作异常！"})
@@ -339,10 +337,10 @@ def get_special_classroom_info():
 
 # 获取教室信息
 @app.route('/get_classInfo_by_id', methods=['POST'])
-def get_classInfo_by_id():
+def get_class_info_by_id():
     if request.get_json().get('classroomId') != 'null':
-        classroomId = request.get_json().get('classroomId')
-        result = mysql.get_classInfo_by_id(classroomId)
+        classroom_id = request.get_json().get('classroomId')
+        result = mysql.get_class_info_by_id(classroom_id)
         if result is None:
             app.logger.error("数据库操作异常！")
             return jsonify({"code": 403, "error": "数据库操作异常！"})
@@ -370,12 +368,12 @@ def appointment_seat():
     if request.get_json().get('classroomId') != 'null' and request.get_json().get('seatX') != 'null' and \
             request.get_json().get('seatY') != 'null' and request.get_json().get('startTime') != 'null' and \
             request.get_json().get('userNo') != 'null':
-        classroomId = request.get_json().get('classroomId')
-        seatX = request.get_json().get('seatX')
-        seatY = request.get_json().get('seatY')
-        startTime = request.get_json().get('startTime')
-        userNo = request.get_json().get('userNo')
-        result = mysql.appointment(startTime, classroomId, seatX, seatY, userNo)
+        classroom_id = request.get_json().get('classroomId')
+        seat_x = request.get_json().get('seatX')
+        seat_y = request.get_json().get('seatY')
+        start_time = request.get_json().get('startTime')
+        user_no = request.get_json().get('userNo')
+        result = mysql.appointment(start_time, classroom_id, seat_x, seat_y, user_no)
         if result is None:
             app.logger.error("数据库操作异常！")
             return jsonify({"code": 403, "error": "数据库操作异常！"})
@@ -401,8 +399,8 @@ def appointment_seat():
 @app.route('/currently_appointment', methods=['POST'])
 def get_currently_appointment():
     if request.get_json().get('userNo') != 'null':
-        userNo = request.get_json().get('userNo')
-        result = mysql.currently_appointment(userNo)
+        user_no = request.get_json().get('userNo')
+        result = mysql.currently_appointment(user_no)
         if result is None:
             app.logger.error("数据库操作异常！")
             return jsonify({"code": 403, "error": "数据库操作异常！"})
@@ -434,10 +432,10 @@ def get_currently_appointment():
 @app.route('/seat_insert', methods=['POST'])
 def seat_insert():
     if request.get_json().get('seatData') != 'null':
-        seatData = request.get_json().get('seatData')
+        seat_data = request.get_json().get('seatData')
         all_data = []
-        classroomId = seatData[0].get('classroomId')
-        for seat in seatData:
+        classroom_id = seat_data[0].get('classroomId')
+        for seat in seat_data:
             fk_classroom_id = seat.get('classroomId')
             seat_x = seat.get('seatX')
             seat_y = seat.get('seatY')
@@ -446,7 +444,7 @@ def seat_insert():
             data = (fk_classroom_id, seat_x, seat_y, seat_state, seat_place)
             all_data.append(data)
         # 批量添加座位信息
-        result = mysql.seat_insert_many(classroomId, all_data)
+        result = mysql.seat_insert_many(classroom_id, all_data)
         if result == 'True':
             app.logger.warn("座位添加成功！")
             return jsonify({"code": 200, "info": "座位添加成功！"})
